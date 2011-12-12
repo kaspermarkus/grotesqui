@@ -1,5 +1,6 @@
 (ns grotesqui.core
- (:use [seesaw core mig] grotesqui.nodes))
+ (:use [seesaw core mig] grotesqui.nodes)
+ (:gen-class :main true))
 
 (def root (frame
           :title "Grotesqui 0.1",
