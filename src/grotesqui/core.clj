@@ -1,5 +1,6 @@
 (ns grotesqui.core
  (:use [seesaw core mig] grotesqui.nodes)
+  (:require [seesaw.dnd :as dnd])
  (:gen-class :main true))
 
 (def root (frame
@@ -24,7 +25,7 @@
 	:items 
 	[ [(label :text "Input" :background "#BBBBFF") "span,growx"]
 	  [(spreadsheet-in describe) "span,growx"]
-	  [(label :text "MySQL" :background "#DDDDFF") "span,growx"]
+	  [(mysql-in describe) "span,growx"]
 	  [(label :text "CSV" :background "#DDDDFF") "span,growx"]
 	  [(label :text "Transformations" :background "#BBFFBB") "span,growx"]
           [(label :text "Search and Replace" :background "#DDFFDD") "span,growx"]
@@ -39,7 +40,16 @@
           [(label :text "CSV" :background "#FFDDDD") "span,growx"]
 	]))
 
-(defn make-canvas [] (label :text "Canvas77" :background "#333333"))
+(defn dropzone [] (label 
+	:text "Drop Here" 
+	:background "#DDDDDD"
+	:transfer-handler [:import [dnd/string-flavor (fn [{:keys [target data]}] (config! target :text data))]]))
+
+(defn make-canvas [] (mig-panel
+	:constraints ["fill", "[grow][center][grow]", ""]
+	:items [ [(label :text "Canvas77" :background "#abcdef") "grow"]
+		 [(dropzone) "w 100, h 40"]
+		 [(label :text "HelloMoe" :background "#abcdef") "grow"]]))
 
 (defn make-description-panel [] (label :text "Description" :id :description-panel))
 
