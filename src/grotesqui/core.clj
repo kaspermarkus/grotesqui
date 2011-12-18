@@ -3,38 +3,13 @@
   (:require [seesaw.dnd :as dnd], [grotesqui.nodes :as uinodes])
  (:gen-class :main true))
 
-;initializes an empty pipe and returns a reference to it
-;(defn add-pipe [pipes] (let [ piperef (ref '())] (do 
-;	(dosync (alter pipes assoc (keyword (gensym "pipe")) piperef))
-;	 piperef)))
-
-;creates a drop zone and assigns it a unique id (to be used for ref. in GUI)
-;(defn create-dropzone [] (list "dropzone" {:type :dropzone, :text "Drop Zone", :id (keyword (gensym "dropzone"))}))
-
-;(defn create-dropzone-ui [dropzone] (let [props (second dropzone)] (label
-;	:text (get props :text)
-;	:id (get props :id)
-;	:background "#DDDDDD"
-;	:transfer-handler [:import [dnd/string-flavor (fn [{:keys [target data]}] (config! target :text data))]])))
-;
-;(defn create-node-ui [node] (let [props (second node)] (cond
-;	(= :dropzone (get props :type)) (create-dropzone-ui node)
-;	:else (println (str "NO MATCH FOR: " (get props :type))))))
-;
-;(defn create-pipe-ui [pipe returnlist] 
-;	(if (= '() pipe) 
-;		(apply vector returnlist)
-;		(recur (rest pipe) (cons (vector (create-node-ui (first pipe)) "growx") returnlist))))
-;
-; 
-;;add single dropzone to pipe:
-;(defn add-to-pipe [pipe node replace-id] (cond
-;	(= replace-id :none) (dosync (alter pipe concat [node]))))
-;
-;
-;(defn update-graph [piperef] (mig-panel
-;	:constraints ["wrap 1", "", ""]
-;	:items (create-pipe-ui @piperef '())))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; UI Handling function
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defn update-pipe-ui
+	"Updates the graphical representation of the givent pipe ref"
+	[piperef]
+	(config! (select root [:#pipe-panel]) :items (map uinodes/node-ui @piperef)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Pipe manipulation functions
@@ -88,16 +63,15 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Base layout stuff:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defn make-canvas 
-	"Creates the canvas, that is the part of the screen that will hold the graph."
-	[] 
+(defn make-canvas
+	[]
 	(mig-panel
-		:constraints ["fill", "[grow][center][grow]", ""]
-		:items 
-			[[(label :text "" :background "#abcdef") "grow"]
-			 ;[(update-graph current-pipe) "w 100, h 40"]
-			 [(border-panel :id :pipe-panel :center "CENTER") "w 100, h 40"] 
-		 	 [(label :text "" :background "#abcdef") "grow"]]))
+	:constraints ["fill,wrap 3", "0[grow]0[]0[grow]0", "0[grow]0[]0[grow]0"]
+	:items [[(label :background "#abcdef") "span 1 3, grow"]
+					[(label :background  "#abcdef") "grow"]
+					[(label :background "#abcdef") "span 1 3, grow"]
+					[(vertical-panel  :id :pipe-panel) ""]
+					[(label :background "#abcdef") "grow"]]))
 
 (defn make-palette 
 	"Creates a palette (list of draggable nodes).

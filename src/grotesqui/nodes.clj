@@ -5,11 +5,11 @@
 
 ;(show! (frame :content () :size [640 :by 480]))
 ;;;;;;;;;;;;;
-TODO:
-we need to create a function that updates the ui with a new pipe... something like:
-(config! (select root [:#pipe-panel]) :center (uinodes/pipe-ui current-pipe))
-.. this should be setting it, but for some reason this isn't working properly.
-perhaps a bug in seesaw
+;TODO:
+;we need to create a function that updates the ui with a new pipe... something like:
+;(config! (select root [:#pipe-panel]) :center (uinodes/pipe-ui current-pipe))
+;.. this should be setting it, but for some reason this isn't working properly.
+;perhaps a bug in seesaw
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; dropzone node
 
