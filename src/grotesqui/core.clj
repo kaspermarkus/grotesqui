@@ -83,7 +83,7 @@
 		:constraints ["", "0[grow]", "0[]0[]"]
 		:items 
 			[[(label :text "Input" :background "#BBBBFF") "span,growx"]
-	  	 [(uinodes/mysql-in describe) "span,growx"]
+	  	 [(uinodes/mysql-in-palette describe) "span,growx"]
 	  	 [(label :text "Transformations" :background "#BBFFBB") "span,growx"]
        [(label :text "Drop Column" :background "#DDFFDD") "span,growx"]]))
 
@@ -114,7 +114,9 @@
 	 			 [(make-canvas) "grow"]]))
 		(describe) ;set the default text in the describe panel
 		(def current-pipe (ref '()))
-		(insert-node current-pipe (uinodes/dropzone))))
+		(insert-node current-pipe (uinodes/dropzone))
+		(update-pipe-ui current-pipe)))	
+		
 
 (defn -main [& args]
 	(init))
