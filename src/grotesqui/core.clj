@@ -1,6 +1,6 @@
 (ns grotesqui.core
  (:use [seesaw core mig])
-  (:require [seesaw.dnd :as dnd], [grotesqui.nodes :as uinodes])
+  (:require [seesaw.dnd :as dnd], [grotesqui.nodes :as uinodes], [grotesqui.fakeql :as ql])
  (:gen-class :main true))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -26,7 +26,7 @@
 ;;;;;;;;;;
 ; current-pipe
 ; Should always be a reference to the pipe currently displayed in the UI.
-(def current-pipe nil)
+;(def current-pipe nil)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; UI Handling function
@@ -39,10 +39,10 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Pipe manipulation functions
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defn insert-node
-	"Inserts the node into the given pipe-ref."
-	[piperef node]
-	(dosync (alter piperef concat [node])))
+;(defn insert-node
+	;"Inserts the node into the given pipe-ref."
+	;([piperef node] (dosync (alter piperef concat [node])))
+	;([piperef node replace-id] replace-id))
 	
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -113,9 +113,10 @@
 				 [(scrollable (make-palette) :hscroll :never) "dock west, width 200px!"]
 	 			 [(make-canvas) "grow"]]))
 		(describe) ;set the default text in the describe panel
-		(def current-pipe (ref '()))
-		(insert-node current-pipe (uinodes/dropzone))
-		(update-pipe-ui current-pipe)))	
+		;(def current-pipe (ref '()))
+		(ql/init-current-pipe)
+		(ql/insert-node ql/current-pipe (ql/node {:type :dropzone}))
+		(update-pipe-ui ql/current-pipe)))	
 		
 
 (defn -main [& args]
