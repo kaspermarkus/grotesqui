@@ -11,7 +11,7 @@
 ; root
 ; The frame holding the application.
 ; This is created as a global var to be used on selects
-(def root (frame
+(def *root* (frame
           :title "Grotesqui 0.1",
           :on-close :hide,
           :size [800 :by 600]))
@@ -34,7 +34,7 @@
 (defn update-pipe-ui
 	"Updates the graphical representation of the givent pipe ref"
 	[piperef]
-	(config! (select root [:#pipe-panel]) :items (map uinodes/node-ui @piperef)))
+	(config! (select *root* [:#pipe-panel]) :items (map uinodes/node-ui @piperef)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Pipe manipulation functions
@@ -51,8 +51,8 @@
 ;(add-to-pipe current-pipe (create-dropzone) :none)
 
 (defn describe 
-	([text] (invoke-later (config! (select root [:#description-panel]) :text text)))
-	([] (invoke-later (config! (select root [:#description-panel]) :text (str
+	([text] (invoke-later (config! (select *root* [:#description-panel]) :text text)))
+	([] (invoke-later (config! (select *root* [:#description-panel]) :text (str
 		"<html><body>"
 		"<h1>Help:</h1>"
 		"<b>New nodes:</b> Drag nodes from left to right<br />"
@@ -105,8 +105,8 @@
 	 - show the root container"
 	[]
 	(do 
-		(invoke-later (show! root))     ;show window
-		(config! root :content (mig-panel   ;fill out with base content
+		(invoke-later (show! *root*))     ;show window
+		(config! *root* :content (mig-panel   ;fill out with base content
 	 		:constraints ["fill", "[fill]", "[fill]"]
 			:items 
 				[[(make-description-panel) "height 150px!, dock south"]
