@@ -1,10 +1,15 @@
 (ns grotesqui.fakeql)
 
+;;;;;;;;;;;
+; list of listeners. Get called on every time pipe is updated
+(def listeners (ref '()))
+
+(defn add-listener [ func ] (dosync (alter listeners concat [func])))
+
 ;;;;;;;;;;
 ; current-pipe
 ; Should always be a reference to the pipe currently displayed in the UI.
-(def current-pipe nil)
-
+(def current-pipe nil) 
 (defn init-current-pipe [] (def current-pipe (ref '())))
 
 (defmulti node :type)
@@ -22,6 +27,9 @@
        postlist (rest (second splitlist))]
 			 (cond
 					(= category :input) (concat [new-node (node {:type :dropzone})] postlist)
+					(= category :output) (concat prelist [(node {:type :dropzone}) new-node])
+					(= category :transformation) 
+						(concat prelist [(node {:type :dropzone}) new-node (node {:type :dropzone})] postlist)
 					:else (println "ERRORRRRRRRRRRRRRRRRRRRRRRRRRR")))))
 
 (defn insert-node
@@ -29,7 +37,8 @@
 	([piperef node] (dosync (alter piperef concat [node])))
 	([piperef node replace-id] 
 			(do
-				(dosync (alter piperef replace-node node replace-id)))))
+				(dosync (alter piperef replace-node node replace-id))
+				(apply (fn [f] (f)) @listeners))))
 
 
 
@@ -42,6 +51,8 @@
     :id (keyword (gensym "dropzone"))
     :grotesqui { :text "Drop Zone"}}))
 
-(defmethod node :mysql-in [props] (list "mysql-in" { :type :mysql-in, :category :input, :id (keyword (gensym "mysql-in"))}))
+(defmethod node :csv-in [props] (list "csv-in" { :type :csv-in, :category :input, :id (keyword (gensym "csv-in"))}))
+(defmethod node :csv-out [props] (list "csv-out" { :type :csv-out, :category :output, :id (keyword (gensym "csv-out"))}))
+(defmethod node :drop-columns [props] (list "drop-columns" { :type :drop-columns, :category :transformation, :id (keyword (gensym "drop-columns"))}))
 
 

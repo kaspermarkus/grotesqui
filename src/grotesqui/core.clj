@@ -83,9 +83,11 @@
 		:constraints ["", "0[grow]", "0[]0[]"]
 		:items 
 			[[(label :text "Input" :background "#BBBBFF") "span,growx"]
-	  	 [(uinodes/mysql-in-palette describe) "span,growx"]
+	  	 [(uinodes/node-palette "csv-in" "input" describe) "span,growx"]
 	  	 [(label :text "Transformations" :background "#BBFFBB") "span,growx"]
-       [(label :text "Drop Column" :background "#DDFFDD") "span,growx"]]))
+	  	 [(uinodes/node-palette "drop-columns" "transformation" describe) "span,growx"]
+	  	 [(label :text "Output" :background "#FFBBBB") "span,growx"]
+	  	 [(uinodes/node-palette "csv-out" "output" describe) "span,growx"]]))
 
 (defn make-description-panel 
 	"Creates an empty description panel with the id :description-panel
@@ -115,6 +117,7 @@
 		(describe) ;set the default text in the describe panel
 		;(def current-pipe (ref '()))
 		(ql/init-current-pipe)
+		(ql/add-listener (fn [] (update-pipe-ui ql/current-pipe)))
 		(ql/insert-node ql/current-pipe (ql/node {:type :dropzone}))
 		(update-pipe-ui ql/current-pipe)))	
 		
