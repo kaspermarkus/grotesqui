@@ -1,5 +1,5 @@
 (ns grotesqui.nodes
- (:use [seesaw core mig])
+ (:use [seesaw core mig dev chooser], [clojure inspector])
 	(:require [seesaw.dnd :as dnd], [grotesqui.fakeql :as ql])
 	(:import javax.swing.TransferHandler))
 
@@ -23,9 +23,8 @@
 				uiprops (get props :grotesqui)
 				id (get props :id)] 
 		(label
-			:text (get uiprops :text)
+			:resource ::dropzone
 			:id id
-			:background "#DDDDDD"
 			:transfer-handler [:import 
 				[dnd/string-flavor (fn [{:keys [target data]}] 
 					(do 
@@ -53,13 +52,51 @@
       	:id (get props :id)
       	:resource ::output)))
 
+(defn csv-in-show-properties []
+  (let
+    [filename-field (label :text "No file selected")
+     file-button (button :text "button")
+     header-checkbox (checkbox)
+     separator (text :text ";")
+     dialog (dialog 
+          :option-type :ok-cancel 
+          :content 
+          (mig-panel
+            :constraints ["", "", ""]
+            :items 
+            [["file:" ""]
+             [filename-field "" ]
+             [file-button "wrap"]
+             ["Separator:" ""]
+             [separator "wrap"]
+             ["Column Titles:" ""]
+             [header-checkbox ""]]))]
+    (do 
+      (listen file-button :action 
+              (fn [e] 
+                    (if-let 
+                  [f (choose-file 
+                       :type "Select"
+                       :selection-mode :files-only
+                       :filters [["CSV files" ["csv"]]
+                          (file-filter "All Files" (constantly true))])]
+        (text! filename-field (str f)))))
+      (show! (pack! dialog)))))
+
+;(csv-in-show-properties)
+
 (defmethod node-ui :csv-in
-	[node]
-	  (let [props (second node)] 
-    	(label
-      	:text ".CSV File"
-      	:id (get props :id)
-      	:resource ::input)))
+  	[node]
+  	  (let 
+       	[props (second node) 
+    		node (label
+      		:text ".CSV File"
+      		:id (get props :id)
+      		:resource ::input)]
+			(do (listen node
+				:mouse-entered (fn [e] (println "some description"))
+				:mouse-clicked (fn [e] (csv-in-show-properties)))
+				node)))
 
 (defn node-palette [ name type describe ] 
 	(let 

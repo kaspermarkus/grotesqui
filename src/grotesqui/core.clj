@@ -1,5 +1,5 @@
 (ns grotesqui.core
- (:use [seesaw core mig])
+ (:use [seesaw core mig dev])
   (:require [seesaw.dnd :as dnd], [grotesqui.nodes :as uinodes], [grotesqui.fakeql :as ql])
  (:gen-class :main true))
 
@@ -16,40 +16,9 @@
           :on-close :hide,
           :size [800 :by 600]))
 
-;;;;;;;;;;
-; pipes
-; ref to map. Holds all the pipes of the programs as map of key/pipe-ref pairs
-; TBD: implement multi pipe functionality. The idea is that we keep a list of 
-; references to pipes in a map: key/pipe-ref
-;(def pipes (ref {}))
-
-;;;;;;;;;;
-; current-pipe
-; Should always be a reference to the pipe currently displayed in the UI.
-;(def current-pipe nil)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; UI Handling function
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defn update-pipe-ui
-	"Updates the graphical representation of the givent pipe ref"
-	[piperef]
-	(config! (select *root* [:#pipe-panel]) :items (map uinodes/node-ui @piperef)))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Pipe manipulation functions
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;(defn insert-node
-	;"Inserts the node into the given pipe-ref."
-	;([piperef node] (dosync (alter piperef concat [node])))
-	;([piperef node replace-id] replace-id))
-	
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;
-;TRASH:
-;;;;;;;;;;;;;;;;;;;;;;;;;
-;(add-to-pipe current-pipe (create-dropzone) :none)
-
+;;;;;;;;;;;
+; describe
+; Description panel
 (defn describe 
 	([text] (invoke-later (config! (select *root* [:#description-panel]) :text text)))
 	([] (invoke-later (config! (select *root* [:#description-panel]) :text (str
@@ -59,6 +28,15 @@
 		"<b>Info:</b> Mouse over anything to get information about it<br />"
 		"<b>Edit:</b> Double click to edit properites<br />"
 		"</body></html>")))))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; UI Handling function
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defn update-pipe-ui
+	"Updates the graphical representation of the givent pipe ref"
+	[piperef] (do (println piperef)
+	(config! (select *root* [:#pipe-panel]) :items (map uinodes/node-ui @piperef))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Base layout stuff:
@@ -80,13 +58,13 @@
 	(mig-panel 
 		;"0[][grow]" - horizontal settings - fill out, the 0 sets left padding to 0px
 		;"0[]0[]" - vertical: set first padding to 0, set spacing between rows to 0
-		:constraints ["", "0[grow]", "0[]0[]"]
+		:constraints ["", "0[grow]", "0[]3[]"]
 		:items 
-			[[(label :text "Input" :background "#BBBBFF") "span,growx"]
+   	           [[(label :text "Input" :h-text-position :center :resource ::input-header ) "span,growx"]
 	  	 [(uinodes/node-palette "csv-in" "input" describe) "span,growx"]
-	  	 [(label :text "Transformations" :background "#BBFFBB") "span,growx"]
+	  	 [(label :text "Transformation" :resource ::transformation-header) "span,growx"]
 	  	 [(uinodes/node-palette "drop-columns" "transformation" describe) "span,growx"]
-	  	 [(label :text "Output" :background "#FFBBBB") "span,growx"]
+	  	 [(label :text "Output" :resource ::output-header) "span,growx"]
 	  	 [(uinodes/node-palette "csv-out" "output" describe) "span,growx"]]))
 
 (defn make-description-panel 
@@ -115,7 +93,6 @@
 				 [(scrollable (make-palette) :hscroll :never) "dock west, width 200px!"]
 	 			 [(make-canvas) "grow"]]))
 		(describe) ;set the default text in the describe panel
-		;(def current-pipe (ref '()))
 		(ql/init-current-pipe)
 		(ql/add-listener (fn [] (update-pipe-ui ql/current-pipe)))
 		(ql/insert-node ql/current-pipe (ql/node {:type :dropzone}))

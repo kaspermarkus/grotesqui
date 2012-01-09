@@ -37,7 +37,7 @@
 	([piperef node] (dosync (alter piperef concat [node])))
 	([piperef node replace-id] 
 			(do
-				(dosync (alter piperef replace-node node replace-id))
+				(dosync (alter piperef replace-node node replace-id))                                              
 				(apply (fn [f] (f)) @listeners))))
 
 
