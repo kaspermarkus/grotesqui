@@ -52,10 +52,10 @@
       	:id (get props :id)
       	:resource ::output)))
 
-(defn csv-in-show-properties [node]
+(defn csv-in-show-properties []
   (let
-    [props (second node)
-		 filename-field (label :text ("No file selected"))
+    [;props (second node)
+		 filename-field (label :text "No file selected")
      file-button (button :text "Browse")
      header-checkbox (checkbox)
      separator (text :text ";")
@@ -96,7 +96,7 @@
       		:resource ::input)]
 			(do (listen node
 				:mouse-entered (fn [e] (println "some description"))
-				:mouse-clicked (fn [e] (csv-in-show-properties node)))
+				:mouse-clicked (fn [e] (csv-in-show-properties)))
 				node)))
 
 (defn node-palette [ name type describe ] 
