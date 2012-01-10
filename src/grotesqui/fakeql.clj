@@ -51,7 +51,15 @@
     :id (keyword (gensym "dropzone"))
     :grotesqui { :text "Drop Zone"}}))
 
-(defmethod node :csv-in [props] (list "csv-in" { :type :csv-in, :category :input, :id (keyword (gensym "csv-in"))}))
+(defmethod node :csv-in [props] 
+	(list "csv-in" 
+		{ :type :csv-in, 
+			:category :input, 
+			:id (keyword (gensym "csv-in")),
+			:filename nil,
+			:header true,
+			:separator ";"}))
+
 (defmethod node :csv-out [props] (list "csv-out" { :type :csv-out, :category :output, :id (keyword (gensym "csv-out"))}))
 (defmethod node :drop-columns [props] (list "drop-columns" { :type :drop-columns, :category :transformation, :id (keyword (gensym "drop-columns"))}))
 
