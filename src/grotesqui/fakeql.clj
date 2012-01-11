@@ -5,6 +5,7 @@
 (def listeners (ref '()))
 
 (defn add-listener [ func ] (dosync (alter listeners concat [func])))
+(defn alert-listeners [] (apply (fn [f] (f)) @listeners))
 
 ;;;;;;;;;;
 ; current-pipe
@@ -13,6 +14,7 @@
 (defn init-current-pipe [] (def current-pipe (ref '())))
 
 (defmulti node :type)
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Pipe manipulation functions
@@ -38,18 +40,21 @@
 	([piperef node replace-id] 
 			(do
 				(dosync (alter piperef replace-node node replace-id))                                              
-				(apply (fn [f] (f)) @listeners))))
+				(alert-listeners))))
 
 (defn update-node
 	"Updates a node in the given pipe-ref."
 	([piperef node]
-    (dosync (alter piperef (fn [pipe] 
-			(let 
-      	[id (get node :id)
-       	 splitlist  (split-with (fn [tstnode] (not (= id (get tstnode :id)))) pipe)
-      	 prelist (first splitlist)
-      	 postlist (rest (second splitlist))]
-						(concat prelist (list node) postlist)))))))
+		(do 
+    	(dosync (alter piperef (fn [pipe] 
+				(let 
+      		[id (get node :id)
+       	 	 splitlist  (split-with (fn [tstnode] (not (= id (get tstnode :id)))) pipe)
+      		 prelist (first splitlist)
+      		 postlist (rest (second splitlist))]
+					(concat prelist (list node) postlist)))))
+			(alert-listeners))))
+
 
 (defn genkw [s] (keyword (gensym s)))
  
