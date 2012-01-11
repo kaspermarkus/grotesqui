@@ -1,7 +1,8 @@
 (ns grotesqui.core
  (:use [seesaw core mig dev])
   (:require [seesaw.dnd :as dnd], [grotesqui.nodes :as uinodes], [grotesqui.fakeql :as ql])
- (:gen-class :main true))
+ ;(:gen-class :main true))
+)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Global vars to hold state

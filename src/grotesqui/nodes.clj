@@ -7,7 +7,7 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; General UI node handling:
-(defmulti node-ui (fn [node] (get (second node) :type)))
+(defmulti node-ui (fn [node] (get node :type)))
 
 ;(defmulti node :type)
 
@@ -19,9 +19,7 @@
 ;Creates a graphical representation of the node passed to the function and returns it
 (defmethod node-ui :dropzone
 	[node]
-	(let [props (second node) 
-				uiprops (get props :grotesqui)
-				id (get props :id)] 
+	(let [ id (get node :id)] 
 		(label
 			:resource ::dropzone
 			:id id
@@ -34,31 +32,27 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; FIX THE BELOW
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;(defmethod node :mysql-in [props] (list "mysql-in" { :type :mysql-in, :id (keyword (gensym "mysql-in"))}))
-
 (defmethod node-ui :drop-columns
 	[node]
-	  (let [props (second node)] 
     	(label
       	:text "Drop Columns"
-      	:id (get props :id)
-      	:resource ::transformation)))
+      	:id (get node :id)
+      	:resource ::transformation))
 
 (defmethod node-ui :csv-out
 	[node]
-	  (let [props (second node)] 
     	(label
       	:text ".CSV File"
-      	:id (get props :id)
-      	:resource ::output)))
+      	:id (get node :id)
+      	:resource ::output))
 
-(defn csv-in-show-properties []
+(defn csv-in-show-properties [node]
   (let
-    [;props (second node)
-		 filename-field (label :text "No file selected")
+    [options (get node :options)
+		 filename-field (label :text (if (= (get options :filename) nil) "No file selected" (get options :filename)))
      file-button (button :text "Browse")
-     header-checkbox (checkbox)
-     separator (text :text ";")
+     header-checkbox (checkbox :selected? (get options :header))
+     separator (text :text (get options :separator))
      dialog (dialog 
           :option-type :ok-cancel 
           :content 
@@ -70,9 +64,10 @@
              [file-button "wrap"]
              ["Separator:" ""]
              [separator "wrap"]
-             ["Column Titles:" ""]
+             ["Column Names:" ""]
              [header-checkbox ""]]))]
     (do 
+			(println node)
       (listen file-button :action 
               (fn [e] 
                     (if-let 
@@ -84,20 +79,18 @@
         (text! filename-field (str f)))))
       (show! (pack! dialog)))))
 
-;(csv-in-show-properties)
-
 (defmethod node-ui :csv-in
   	[node]
   	  (let 
-       	[props (second node) 
-    		node (label
+       	[
+    		uinode (label
       		:text ".CSV File"
-      		:id (get props :id)
+      		:id (get node :id)
       		:resource ::input)]
-			(do (listen node
+			(do (listen uinode
 				:mouse-entered (fn [e] (println "some description"))
-				:mouse-clicked (fn [e] (csv-in-show-properties)))
-				node)))
+				:mouse-clicked (fn [e] (csv-in-show-properties node)))
+				uinode)))
 
 (defn node-palette [ name type describe ] 
 	(let 
