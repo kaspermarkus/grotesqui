@@ -49,12 +49,13 @@
 (defn csv-in-show-properties [node]
   (let
     [options (get node :options)
-		 filename-field (label :text (if (= (get options :filename) nil) "No file selected" (get options :filename)))
+		 filename-field (label :id :filename :text (if (= (get options :filename) nil) "No file selected" (get options :filename)))
      file-button (button :text "Browse")
-     header-checkbox (checkbox :selected? (get options :header))
-     separator (text :text (get options :separator))
+     header-checkbox (checkbox :id :header :selected? (get options :header))
+     separator (text :id :separator :text (get options :separator))
      dialog (dialog 
           :option-type :ok-cancel 
+					:success-fn (fn [e] (let [updated-node (assoc node :options (value e))] (do (println updated-node) (ql/update-node ql/current-pipe updated-node))))
           :content 
           (mig-panel
             :constraints ["", "", ""]

@@ -40,6 +40,16 @@
 				(dosync (alter piperef replace-node node replace-id))                                              
 				(apply (fn [f] (f)) @listeners))))
 
+(defn update-node
+	"Updates a node in the given pipe-ref."
+	([piperef node]
+    (dosync (alter piperef (fn [pipe] 
+			(let 
+      	[id (get node :id)
+       	 splitlist  (split-with (fn [tstnode] (not (= id (get tstnode :id)))) pipe)
+      	 prelist (first splitlist)
+      	 postlist (rest (second splitlist))]
+						(concat prelist (list node) postlist)))))))
 
 (defn genkw [s] (keyword (gensym s)))
  
