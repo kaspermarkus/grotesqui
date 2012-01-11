@@ -49,7 +49,7 @@
 	:items [[(label :background "#abcdef") "span 1 3, grow"]
 					[(label :background  "#abcdef") "grow"]
 					[(label :background "#abcdef") "span 1 3, grow"]
-					[(vertical-panel  :id :pipe-panel) ""]
+					[(grid-panel  :id :pipe-panel :background "#000") "width 200px!, grow"]
 					[(label :background "#abcdef") "grow"]]))
 
 (defn make-palette 
@@ -61,12 +61,12 @@
 		;"0[]0[]" - vertical: set first padding to 0, set spacing between rows to 0
 		:constraints ["", "0[grow]", "0[]3[]"]
 		:items 
-   	           [[(label :text "Input" :h-text-position :center :resource ::input-header ) "span,growx"]
-	  	 [(uinodes/node-palette "csv-in" "input" describe) "span,growx"]
-	  	 [(label :text "Transformation" :resource ::transformation-header) "span,growx"]
-	  	 [(uinodes/node-palette "drop-columns" "transformation" describe) "span,growx"]
-	  	 [(label :text "Output" :resource ::output-header) "span,growx"]
-	  	 [(uinodes/node-palette "csv-out" "output" describe) "span,growx"]]))
+			[[(label :text "Input" :resource ::input-header ) "span,growx"]
+			[(uinodes/node-palette "csv-in" "input" describe) "span,growx"]
+			[(label :text "Transformation" :resource ::transformation-header) "span,growx"]
+			[(uinodes/node-palette "drop-columns" "transformation" describe) "span,growx"]
+			[(label :text "Output" :resource ::output-header) "span,growx"]
+			[(uinodes/node-palette "csv-out" "output" describe) "span,growx"]]))
 
 (defn make-description-panel 
 	"Creates an empty description panel with the id :description-panel

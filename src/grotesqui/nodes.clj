@@ -1,5 +1,5 @@
 (ns grotesqui.nodes
- (:use [seesaw core mig dev chooser], [clojure inspector])
+ (:use [seesaw core mig dev chooser border], [clojure inspector])
 	(:require [seesaw.dnd :as dnd], [grotesqui.fakeql :as ql])
 	(:import javax.swing.TransferHandler))
 
@@ -9,19 +9,16 @@
 ; General UI node handling:
 (defmulti node-ui (fn [node] (get node :type)))
 
-;(defmulti node :type)
-
-(defn pipe-ui
-	"Creates a graphical representation of the pipe"
-	[piperef]
-	(grid-panel :columns 1 :items (map node-ui @piperef)))	
-
 ;Creates a graphical representation of the node passed to the function and returns it
 (defmethod node-ui :dropzone
 	[node]
 	(let [ id (get node :id)] 
 		(label
 			:resource ::dropzone
+			:halign :center
+			:h-text-position :center
+			:background :aliceblue
+			:border (line-border :color "#000")
 			:id id
 			:transfer-handler [:import 
 				[dnd/string-flavor (fn [{:keys [target data]}] 
@@ -35,16 +32,22 @@
 (defmethod node-ui :drop-columns
 	[node]
     	(label
-      	:text "Drop Columns"
-      	:id (get node :id)
-      	:resource ::transformation))
+				:text "Drop Columns"
+				:id (get node :id)
+				:h-text-position :center
+				:halign :center
+				:border (line-border :color "#000")
+				:resource ::transformation))
 
 (defmethod node-ui :csv-out
 	[node]
     	(label
-      	:text ".CSV File"
-      	:id (get node :id)
-      	:resource ::output))
+				:text ".CSV File"
+				:h-text-position :center
+				:halign :center
+				:border (line-border :color "#000")
+				:id (get node :id)
+				:resource ::output))
 
 (defn csv-in-show-properties [node]
   (let
@@ -70,24 +73,27 @@
     (do 
 			(println node)
       (listen file-button :action 
-              (fn [e] 
-                    (if-let 
-                  [f (choose-file 
-                       :type "Select"
-                       :selection-mode :files-only
-                       :filters [["CSV files" ["csv"]]
-                          (file-filter "All Files" (constantly true))])]
-        (text! filename-field (str f)))))
+        (fn [e] 
+           (if-let 
+             [f (choose-file 
+               :type "Select"
+               :selection-mode :files-only
+               :filters [["CSV files" ["csv"]]
+                  (file-filter "All Files" (constantly true))])]
+        			(text! filename-field (str f)))))
       (show! (pack! dialog)))))
 
 (defmethod node-ui :csv-in
   	[node]
   	  (let 
-       	[
-    		uinode (label
-      		:text ".CSV File"
-      		:id (get node :id)
-      		:resource ::input)]
+       	[uinode 
+					(label
+						:h-text-position :center
+						:halign :center
+						:border (line-border :color "#000")
+						:text ".CSV File"
+						:id (get node :id)
+						:resource ::input)]
 			(do (listen uinode
 				:mouse-entered (fn [e] (println "some description"))
 				:mouse-clicked (fn [e] (csv-in-show-properties node)))
