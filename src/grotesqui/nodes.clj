@@ -39,15 +39,54 @@
 				:border (line-border :color "#000")
 				:resource ::transformation))
 
+(defn csv-out-show-properties [node]
+	  (let
+    [options (get node :options)
+     filename-field (text :id :filename :text (if (= (get options :filename) nil) "" (get options :filename)))
+     file-button (button :text "Browse")
+     header-checkbox (checkbox :id :header :selected? (get options :header)) 
+     separator (text :id :separator :text (get options :separator))
+     dialog (dialog 
+          :option-type :ok-cancel 
+          :success-fn (fn [e] (let [updated-node (assoc node :options (value e))] (do (println updated-node) (ql/update-node ql/current-pipe updated-node))))
+          :content
+          (mig-panel
+            :constraints ["", "", ""]
+            :items
+            [["file:" ""]
+             [filename-field "width 200px!"]
+             [file-button "wrap"]
+             ["Separator:" ""]
+             [separator "wrap"]
+             ["Column Names:" ""]
+             [header-checkbox ""]]))]
+    (do
+      (println node)
+      (listen file-button :action
+        (fn [e]
+           (if-let
+             [f (choose-file
+               :type "Select"
+               :filters [["CSV files" ["csv"]]
+                  (file-filter "All Files" (constantly true))])]
+              (text! filename-field (str f)))))
+      (show! (pack! dialog)))))
+
 (defmethod node-ui :csv-out
 	[node]
-    	(label
-				:text ".CSV File"
-				:h-text-position :center
-				:halign :center
-				:border (line-border :color "#000")
-				:id (get node :id)
-				:resource ::output))
+    (let 
+			[uinode 
+				(label
+					:text ".CSV File"
+					:h-text-position :center
+					:halign :center
+					:border (line-border :color "#000")
+					:id (get node :id)
+					:resource ::output)]
+			(do (listen uinode
+				:mouse-entered (fn [e] (println "some description"))
+        :mouse-clicked (fn [e] (csv-out-show-properties node)))
+        uinode)))
 
 (defn csv-in-show-properties [node]
   (let

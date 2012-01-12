@@ -68,7 +68,12 @@
 		:id (genkw "csv-in"),
 		:options { :filename nil, :header true, :separator ";"}})
 
-(defmethod node :csv-out [props] { :type :csv-out, :category :output, :id (genkw "csv-out")})
+(defmethod node :csv-out [props] 
+	{ :type :csv-out, 
+		:category :output, 
+		:id (genkw "csv-out")
+		:options { :filename nil, :header true, :separator ";"}})
+
 (defmethod node :drop-columns [props] { :type :drop-columns, :category :transformation, :id (genkw "drop-columns")})
 
 
