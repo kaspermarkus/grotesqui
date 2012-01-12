@@ -12,10 +12,7 @@
 ; root
 ; The frame holding the application.
 ; This is created as a global var to be used on selects
-(def *root* (frame
-          :title "Grotesqui 0.1",
-          :on-close :hide,
-          :size [800 :by 600]))
+(def *root* nil)
 
 ;;;;;;;;;;;
 ; describe
@@ -86,6 +83,10 @@
 	 - show the root container"
 	[]
 	(do 
+		(def *root* (frame
+          :title "Grotesqui 0.1",
+          :on-close :hide,
+          :size [800 :by 600]))
 		(invoke-later (show! *root*))     ;show window
 		(config! *root* :content (mig-panel   ;fill out with base content
 	 		:constraints ["fill", "[fill]", "[fill]"]
