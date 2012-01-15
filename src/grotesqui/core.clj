@@ -12,7 +12,12 @@
 ; root
 ; The frame holding the application.
 ; This is created as a global var to be used on selects
-(def *root* nil)
+(def ^:dynamic *root* nil)
+
+;;;;;;;;;;
+; modified flag
+; flag telling whether anything has been modified since last save
+(def ^:dynamic *modified-flag* false)
 
 ;;;;;;;;;;;
 ; describe
@@ -83,7 +88,7 @@
 	 - show the root container"
 	[]
 	(do 
-		(def *root* (frame
+		(def ^:dynamic *root* (frame
           :title "Grotesqui 0.1",
           :on-close :hide,
           :size [800 :by 600]))
