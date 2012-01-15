@@ -77,4 +77,12 @@
     (spit filename (str "'" (pr-str @current-pipe))))
 
 (defn load-pipes [filename]
-  (load-file filename))
+  (do
+    (dosync (alter current-pipe (fn [pipe] (load-file filename))))
+    (alert-listeners)))
+
+(defn new-pipes []
+  (do 
+    (dosync (alter current-pipe (fn [pipe] (list (node {:type :dropzone})))))
+    (alert-listeners)))
+  

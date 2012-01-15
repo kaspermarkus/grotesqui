@@ -14,13 +14,6 @@
 ; This is created as a global var to be used on selects
 (def ^:dynamic *root* nil)
 
-;;;;;;;;;;
-; modified flag
-; flag telling whether anything has been modified since last save
-(def ^:dynamic *modified-flag* false)
-
-(ql/add-listener (fn [] (do (def ^:dynamic *modified-flag* true) (println *modified-flag*)))) 
-
 ;;;;;;;;;;;
 ; describe
 ; Description panel
@@ -79,13 +72,15 @@
 
 (defn mbar 
   []
-  (let [save-item (menu-item :text "Save")
+  (let [new-item (menu-item :text "New")
+        save-item (menu-item :text "Save")
         load-item (menu-item :text "Load")
-        quit-item (menu-item :text "Quit")] 
+        quit-item (menu-item :text "Quit")
+        run-item (menu-item :text "Run")
+        test-item (menu-item :text "Test")] 
     (menubar :items 
            [(menu :text "File" :items [ new-item load-item save-item quit-item ])
-            (menu :text "Actions" :items [ run-item test-item ])])))
-           
+            (menu :text "Actions" :items [ run-item test-item ])])))           
            
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Initialization
@@ -99,9 +94,10 @@
 	 - show the root container"
 	[]
 	(do 
-		(def ^:dynamic *root* (frame
+   		(def ^:dynamic *root* (frame
           :title "Grotesqui 0.1",
           :on-close :hide,
+          :menubar (mbar)
           :size [800 :by 600]))
 		(invoke-later (show! *root*))     ;show window
 		(config! *root* :content (mig-panel   ;fill out with base content
@@ -113,8 +109,7 @@
 		(describe) ;set the default text in the describe panel
 		(ql/init-current-pipe)
 		(ql/add-listener (fn [] (update-pipe-ui ql/current-pipe)))
-		(ql/insert-node ql/current-pipe (ql/node {:type :dropzone}))
-		(update-pipe-ui ql/current-pipe)))	
+		(ql/new-pipes)))
 		
 
 (defn -main [& args]
