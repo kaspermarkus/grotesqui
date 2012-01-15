@@ -77,6 +77,16 @@
 	[] 
 	(label :text "Description" :id :description-panel))
 
+(defn mbar 
+  []
+  (let [save-item (menu-item :text "Save")
+        load-item (menu-item :text "Load")
+        quit-item (menu-item :text "Quit")] 
+    (menubar :items 
+           [(menu :text "File" :items [ new-item load-item save-item quit-item ])
+            (menu :text "Actions" :items [ run-item test-item ])])))
+           
+           
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Initialization
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
