@@ -3,7 +3,6 @@
 ;;;;;;;;;;;
 ; list of listeners. Get called on every time pipe is updated
 (def listeners (ref '()))
-
 (defn add-listener [ func ] (dosync (alter listeners concat [func])))
 (defn alert-listeners [] (apply (fn [f] (f)) @listeners))
 
@@ -13,8 +12,27 @@
 (def current-pipe nil) 
 (defn init-current-pipe [] (def current-pipe (ref '())))
 
+(defn genkw [s] (keyword (gensym s)))
+
 (defmulti node :type)
 
+(defmethod node :dropzone [props]
+  { :type :dropzone
+    :id (genkw "dropzone")})
+
+(defmethod node :csv-in [props] 
+	{ :type :csv-in, 
+		:category :input, 
+		:id (genkw "csv-in"),
+		:options { :filename nil, :header true, :separator ";"}})
+
+(defmethod node :csv-out [props] 
+	{ :type :csv-out, 
+		:category :output, 
+		:id (genkw "csv-out")
+		:options { :filename nil, :header true, :separator ";"}})
+
+(defmethod node :drop-columns [props] { :type :drop-columns, :category :transformation, :id (genkw "drop-columns")})
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Pipe manipulation functions
@@ -39,7 +57,7 @@
 	([piperef node] (dosync (alter piperef concat [node])))
 	([piperef node replace-id] 
 			(do
-				(dosync (alter piperef replace-node node replace-id))                                              
+				(dosync (alter piperef replace-node node replace-id))
 				(alert-listeners))))
 
 (defn update-node
@@ -54,26 +72,4 @@
       		 postlist (rest (second splitlist))]
 					(concat prelist (list node) postlist)))))
 			(alert-listeners))))
-
-
-(defn genkw [s] (keyword (gensym s)))
- 
-(defmethod node :dropzone [props]
-  { :type :dropzone
-    :id (genkw "dropzone")})
-
-(defmethod node :csv-in [props] 
-	{ :type :csv-in, 
-		:category :input, 
-		:id (genkw "csv-in"),
-		:options { :filename nil, :header true, :separator ";"}})
-
-(defmethod node :csv-out [props] 
-	{ :type :csv-out, 
-		:category :output, 
-		:id (genkw "csv-out")
-		:options { :filename nil, :header true, :separator ";"}})
-
-(defmethod node :drop-columns [props] { :type :drop-columns, :category :transformation, :id (genkw "drop-columns")})
-
 
