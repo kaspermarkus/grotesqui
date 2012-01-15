@@ -19,6 +19,8 @@
 ; flag telling whether anything has been modified since last save
 (def ^:dynamic *modified-flag* false)
 
+;(ql/add-listener (fn [] (do (def ^:dynamic *modified-flag* true) (println *modified-flag*)))) 
+
 ;;;;;;;;;;;
 ; describe
 ; Description panel
@@ -38,7 +40,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn update-pipe-ui
 	"Updates the graphical representation of the givent pipe ref"
-	[piperef] (do (println piperef)
+	[piperef] (do (println (str "PIPE: " piperef))
 	(config! (select *root* [:#pipe-panel]) :items (map uinodes/node-ui @piperef))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
