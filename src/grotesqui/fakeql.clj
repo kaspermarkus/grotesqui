@@ -4,7 +4,7 @@
 ; list of listeners. Get called on every time pipe is updated
 (def listeners (ref '()))
 (defn add-listener [ func ] (dosync (alter listeners concat [func])))
-(defn alert-listeners [] (do (println "Alert Listeners called") (doall (map (fn [f] (f)) @listeners))))
+(defn alert-listeners [] (doall (map (fn [f] (f)) @listeners)))
 
 ;;;;;;;;;;
 ; current-pipe
@@ -73,3 +73,8 @@
 					(concat prelist (list node) postlist)))))
 			(alert-listeners))))
 
+(defn save-pipes [filename] 
+    (spit filename (str "'" (pr-str @current-pipe))))
+
+(defn load-pipes [filename]
+  (load-file filename))
