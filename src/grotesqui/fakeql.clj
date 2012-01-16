@@ -13,6 +13,12 @@
 (def ^{:dynamic :true :private :true} *current-pipe* (ref '())) 
 (defn get-current-pipe [] @*current-pipe*)
 
+
+;;;;;;;;;;
+; last-save-file
+; holds the file where pipe was last saved
+(def ^:dynamic *last-save-file* nil)
+
 (defn- genkw [s] (keyword (gensym s)))
 
 (defmulti node :type)
@@ -74,15 +80,19 @@
 			(alert-listeners))))
 
 (defn save-pipes [filename] 
-    (spit filename (str "'" (pr-str @*current-pipe*))))
+    (do 
+      (spit filename (str "'" (pr-str @*current-pipe*)))
+      (def ^:dynamic *last-save-file* filename)))
 
 (defn load-pipes [filename]
   (do
-    (dosync (alter *current-pipe* (fn [pipe] (load-file filename))))
+    (dosync (ref-set *current-pipe* (load-file filename)))
+    (def ^:dynamic *last-save-file* filename)
     (alert-listeners)))
 
 (defn new-pipes []
   (do 
-    (dosync (alter *current-pipe* (fn [pipe] (list (node {:type :dropzone})))))
+    (dosync (ref-set *current-pipe* (list (node {:type :dropzone}))))
+    (def ^:dynamic *last-save-file* nil)
     (alert-listeners)))
   

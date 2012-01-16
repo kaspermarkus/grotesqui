@@ -1,5 +1,5 @@
 (ns grotesqui.core
- (:use [seesaw core mig dev])
+ (:use [seesaw core mig chooser dev])
   (:require [seesaw.dnd :as dnd], [grotesqui.nodes :as uinodes], [grotesqui.fakeql :as ql])
  ;(:gen-class :main true))
 )
@@ -26,6 +26,42 @@
 		"<b>Info:</b> Mouse over anything to get information about it<br />"
 		"<b>Edit:</b> Double click to edit properites<br />"
 		"</body></html>")))))
+
+(defn save-as-action [e]
+  (do 
+    (if-let 
+      [f (choose-file 
+           :type "Save"
+           :selection-mode :files-only)]
+      (ql/save-pipes (str f)))))
+
+(defn save-action [e]
+  (if (= ql/*last-save-file* nil) (save-as-action e) (ql/save-pipes ql/*last-save-file*)))
+
+(defn check-unsaved-changes
+  [callback]
+  (let [empty-pipe? (= (count (ql/get-current-pipe)) 1)
+        last-saved (if (= ql/*last-save-file* nil) nil (load-file ql/*last-save-file*))]
+    (if (and (not empty-pipe?) (not (= last-saved (ql/get-current-pipe))))
+      (do 
+        (show! (pack! (dialog 
+                        :type :warning 
+                        :option-type :yes-no-cancel 
+                        :content "You have unsaved changes!\n\nDo you want to save the current program before continuing?"
+                        :success-fn (fn [p] (do (save-action nil) (callback)))
+                        :no-fn (fn [p] (callback))))))
+      (callback))))
+
+(defn load-action [e]
+  (check-unsaved-changes 
+    (fn [] (if-let 
+             [f (choose-file 
+                  :type "Load"
+                  :selection-mode :files-only)]
+      (ql/load-pipes (str f))))))
+
+(defn new-action [e]
+  (check-unsaved-changes ql/new-pipes))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -70,17 +106,23 @@
 	[] 
 	(label :text "Description" :id :description-panel))
 
+
 (defn mbar 
   []
   (let [new-item (menu-item :text "New")
         save-item (menu-item :text "Save")
+        save-as-item (menu-item :text "Save As..")
         load-item (menu-item :text "Load")
         quit-item (menu-item :text "Quit")
         run-item (menu-item :text "Run")
         test-item (menu-item :text "Test")] 
-    (menubar :items 
-           [(menu :text "File" :items [ new-item load-item save-item quit-item ])
-            (menu :text "Actions" :items [ run-item test-item ])])))           
+    (do (listen save-as-item :action save-as-action)
+        (listen save-item :action save-action)
+        (listen load-item :action load-action)
+        (listen new-item :action new-action)
+        (menubar :items 
+           [(menu :text "File" :items [ new-item load-item save-item save-as-item quit-item ])
+            (menu :text "Actions" :items [ run-item test-item ])]))))           
            
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Initialization
