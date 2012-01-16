@@ -33,7 +33,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn update-pipe-ui
 	"Updates the graphical representation of the givent pipe ref"
-	[piperef] (do (config! (select *root* [:#pipe-panel]) :items (map uinodes/node-ui @piperef))))
+	[] (do (config! (select *root* [:#pipe-panel]) :items (map uinodes/node-ui (ql/get-current-pipe)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Base layout stuff:
@@ -107,10 +107,8 @@
 				 [(scrollable (make-palette) :hscroll :never) "dock west, width 200px!"]
 	 			 [(make-canvas) "grow"]]))
 		(describe) ;set the default text in the describe panel
-		(ql/init-current-pipe)
-		(ql/add-listener (fn [] (update-pipe-ui ql/current-pipe)))
+		(ql/add-listener (fn [] (update-pipe-ui)))
 		(ql/new-pipes)))
-		
 
 (defn -main [& args]
 	(init))

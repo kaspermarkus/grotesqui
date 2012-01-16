@@ -2,17 +2,18 @@
 
 ;;;;;;;;;;;
 ; list of listeners. Get called on every time pipe is updated
-(def listeners (ref '()))
-(defn add-listener [ func ] (dosync (alter listeners concat [func])))
-(defn alert-listeners [] (doall (map (fn [f] (f)) @listeners)))
+(def ^{:dynamic :true :private :true} *listeners* (ref '()))
+
+(defn add-listener [ func ] (dosync (alter *listeners* concat [func])))
+(defn alert-listeners [] (doall (map (fn [f] (f)) @*listeners*)))
 
 ;;;;;;;;;;
 ; current-pipe
 ; Should always be a reference to the pipe currently displayed in the UI.
-(def current-pipe nil) 
-(defn init-current-pipe [] (def current-pipe (ref '())))
+(def ^{:dynamic :true :private :true} *current-pipe* (ref '())) 
+(defn get-current-pipe [] @*current-pipe*)
 
-(defn genkw [s] (keyword (gensym s)))
+(defn- genkw [s] (keyword (gensym s)))
 
 (defmulti node :type)
 
@@ -37,7 +38,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Pipe manipulation functions
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defn replace-node
+(defn- replace-node
   "Inserts the node into the given pipe-ref."
   ([pipe new-node replace-id]
     (let 
@@ -53,18 +54,17 @@
 					:else (println "ERRORRRRRRRRRRRRRRRRRRRRRRRRRR")))))
 
 (defn insert-node
-	"Inserts the node into the given pipe-ref."
-	([piperef node] (dosync (alter piperef concat [node])))
-	([piperef node replace-id] 
-			(do
-				(dosync (alter piperef replace-node node replace-id))
-				(alert-listeners))))
+	"Inserts the node into the current pipe"
+	[node replace-id] 
+   	(do
+        		(dosync (alter *current-pipe* replace-node node replace-id))
+		(alert-listeners)))
 
 (defn update-node
-	"Updates a node in the given pipe-ref."
-	([piperef node]
+	"Updates a node in the current pipe."
+	([node]
 		(do 
-    	(dosync (alter piperef (fn [pipe] 
+    	(dosync (alter *current-pipe* (fn [pipe] 
 				(let 
       		[id (get node :id)
        	 	 splitlist  (split-with (fn [tstnode] (not (= id (get tstnode :id)))) pipe)
@@ -74,15 +74,15 @@
 			(alert-listeners))))
 
 (defn save-pipes [filename] 
-    (spit filename (str "'" (pr-str @current-pipe))))
+    (spit filename (str "'" (pr-str @*current-pipe*))))
 
 (defn load-pipes [filename]
   (do
-    (dosync (alter current-pipe (fn [pipe] (load-file filename))))
+    (dosync (alter *current-pipe* (fn [pipe] (load-file filename))))
     (alert-listeners)))
 
 (defn new-pipes []
   (do 
-    (dosync (alter current-pipe (fn [pipe] (list (node {:type :dropzone})))))
+    (dosync (alter *current-pipe* (fn [pipe] (list (node {:type :dropzone})))))
     (alert-listeners)))
   

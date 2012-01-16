@@ -24,7 +24,7 @@
 				[dnd/string-flavor (fn [{:keys [target data]}] 
 					(do 
 						(println (str "Dropping new node on " id)) 
-						(ql/insert-node ql/current-pipe (ql/node {:type (keyword data)}) id)))]])))
+						(ql/insert-node (ql/node {:type (keyword data)}) id)))]])))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; FIX THE BELOW
@@ -48,7 +48,7 @@
      separator (text :id :separator :text (get options :separator))
      dialog (dialog 
           :option-type :ok-cancel 
-          :success-fn (fn [e] (let [updated-node (assoc node :options (value e))] (do (println updated-node) (ql/update-node ql/current-pipe updated-node))))
+          :success-fn (fn [e] (let [updated-node (assoc node :options (value e))] (do (println updated-node) (ql/update-node updated-node))))
           :content
           (mig-panel
             :constraints ["", "", ""]
@@ -97,7 +97,7 @@
      separator (text :id :separator :text (get options :separator))
      dialog (dialog 
           :option-type :ok-cancel 
-					:success-fn (fn [e] (let [updated-node (assoc node :options (value e))] (do (println updated-node) (ql/update-node ql/current-pipe updated-node))))
+	:success-fn (fn [e] (let [updated-node (assoc node :options (value e))] (do (println updated-node) (ql/update-node updated-node))))
           :content 
           (mig-panel
             :constraints ["", "", ""]
