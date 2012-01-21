@@ -1,6 +1,8 @@
 (ns grotesqui.nodes
- (:use [seesaw core mig dev chooser border], [clojure inspector])
-	(:require [seesaw.dnd :as dnd], [grotesqui.fakeql :as ql])
+  (:use [seesaw core mig dev chooser border], [clojure inspector])
+  (:require [seesaw.dnd :as dnd], 
+           [grotesqui.fakeql :as ql],
+           [grotesqui.description-pane :as description-pane])
 	(:import javax.swing.TransferHandler))
 
 ;(show! (frame :content () :size [640 :by 480]))
@@ -84,7 +86,9 @@
 					:id (get node :id)
 					:resource ::output)]
 			(do (listen uinode
-				:mouse-entered (fn [e] (println "some description"))
+				
+                :mouse-entered (fn [e] (description-pane/describe-map uinode "Properties for CSV Output node" (get node :options)))
+                :mouse-exited (fn [e] (description-pane/update-text uinode))
         :mouse-clicked (fn [e] (csv-out-show-properties node)))
         uinode)))
 
@@ -122,17 +126,7 @@
         			(text! filename-field (str f)))))
       (show! (pack! dialog)))))
 
-(defn all-keys-to-string [options]
-  (map (fn [key] (str "<p><b>" (name key) ":</b> " (get options key) "</p>")) (keys options)))
 
-(defn properties-to-string [node]
-  (str "<html><body><h4>Properties</h4>" (apply str (all-keys-to-string (get node :options))) "</body></html>"))
-
-;(defn properties-to-string [node] 
-;  (let [options (get node :options)]
-;    (str "<html><body>" 
-;         (map (fn [key] (apply str (str "<p><b>" (name key) ":</b> " (get options key) "</p>"))) (keys options))
-;         "</body></html>")))
 
 (defmethod node-ui :csv-in [node]
   (let 
@@ -144,13 +138,13 @@
               :id (get node :id)
               :resource ::input)]
     (do (listen uinode
-                :mouse-entered (fn [e] (invoke-later
-                  (config! (select (to-root uinode) [:#description-panel]) :text (properties-to-string node))))
-                	:mouse-clicked (fn [e] (csv-in-show-properties node)))
+                :mouse-entered (fn [e] (description-pane/describe-map uinode "Properties for CSV Input node" (get node :options)))
+                :mouse-exited (fn [e] (description-pane/update-text uinode))
+                :mouse-clicked (fn [e] (csv-in-show-properties node)))
         uinode)))
 
 
-(defn node-palette [ name type describe ] 
+(defn node-palette [ name type ] 
 	(let 
 		[to-keyword  (fn [ kw ] (keyword (str (namespace ::tmp) "/" kw)))
 		 node (label
@@ -164,8 +158,8 @@
             :start   (fn [c] [dnd/string-flavor name])}))]
 	  (do
 			(listen node
-    		:mouse-entered (fn [e] (describe (to-keyword (str name "-description"))))
-      	:mouse-exited (fn [e] (describe))
+    		:mouse-entered (fn [e] (description-pane/update-text node (to-keyword (str name "-description"))))
+      	:mouse-exited (fn [e] (description-pane/update-text node))
       	:mouse-pressed (fn [evt] (let [comp (.getSource evt)]
           (.exportAsDrag (.getTransferHandler comp) comp evt TransferHandler/COPY))))
        node)))

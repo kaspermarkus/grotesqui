@@ -1,6 +1,10 @@
 (ns grotesqui.core
  (:use [seesaw core mig chooser dev border font])
-  (:require [seesaw.dnd :as dnd], [grotesqui.nodes :as uinodes], [grotesqui.fakeql :as ql])
+  (:require [seesaw.dnd :as dnd], 
+            [grotesqui.nodes :as uinodes], 
+            [grotesqui.fakeql :as ql],
+            [grotesqui.description-pane :as description-pane]
+            )
  ;(:gen-class :main true))
 )
 
@@ -14,12 +18,6 @@
 ; This is created as a global var to be used on selects
 (def ^:dynamic *root* nil)
 
-;;;;;;;;;;;
-; describe
-; Description panel
-(defn describe 
-	([text] (invoke-later (config! (select *root* [:#description-panel]) :text text)))
-	([] (invoke-later (config! (select *root* [:#description-panel]) :resource ::description-pane))))
 
 (defn save-as-action [e]
   (do 
@@ -88,17 +86,11 @@
 		:constraints ["", "0[grow]", "0[]3[]"]
 		:items 
 			[[(label :text "Input" :resource ::input-header ) "span,growx"]
-			[(uinodes/node-palette "csv-in" "input" describe) "span,growx"]
+			[(uinodes/node-palette "csv-in" "input") "span,growx"]
 			[(label :text "Transformation" :resource ::transformation-header) "span,growx"]
-			[(uinodes/node-palette "drop-columns" "transformation" describe) "span,growx"]
+			[(uinodes/node-palette "drop-columns" "transformation") "span,growx"]
 			[(label :text "Output" :resource ::output-header) "span,growx"]
-			[(uinodes/node-palette "csv-out" "output" describe) "span,growx"]]))
-
-(defn make-description-panel 
-	"Creates an empty description panel with the id :description-panel
-	 This will hold error messages when relevant and help text when mousing over things"
-	[] 
-	(label :text "Description" :id :description-panel :font (font :style :plain) :border (line-border :color "#999" :thickness 1) :background "#fff" :v-text-position :top :valign :top))
+			[(uinodes/node-palette "csv-out" "output") "span,growx"]]))
 
 
 
@@ -140,10 +132,10 @@
 		(config! *root* :content (mig-panel   ;fill out with base content
 	 		:constraints ["fill", "[fill]", "[fill]"]
 			:items 
-				[[(make-description-panel) "gap 10px 6px 10px 6px, height 150px!, dock south"]
+				[[(description-pane/new-description-panel) "gap 10px 6px 10px 6px, height 150px!, dock south"]
 				 [(scrollable (make-palette) :hscroll :never) "dock west, width 200px!"]
 	 			 [(make-canvas) "grow"]]))
-		(describe) ;set the default text in the describe panel
+		(description-pane/update-text *root*) ;set the default text in the describe panel
 		(ql/add-listener (fn [] (update-pipe-ui)))
 		(ql/new-pipes)))
 
