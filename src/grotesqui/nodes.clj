@@ -122,21 +122,33 @@
         			(text! filename-field (str f)))))
       (show! (pack! dialog)))))
 
-(defmethod node-ui :csv-in
-  	[node]
-  	  (let 
-       	[uinode 
-					(label
-						:h-text-position :center
-						:halign :center
-						:border (line-border :color "#000")
-						:text ".CSV File"
-						:id (get node :id)
-						:resource ::input)]
-			(do (listen uinode
-				:mouse-entered (fn [e] (println "some description"))
-				:mouse-clicked (fn [e] (csv-in-show-properties node)))
-				uinode)))
+(defn all-keys-to-string [options]
+  (map (fn [key] (str "<p><b>" (name key) ":</b> " (get options key) "</p>")) (keys options)))
+
+(defn properties-to-string [node]
+  (str "<html><body><h4>Properties</h4>" (apply str (all-keys-to-string (get node :options))) "</body></html>"))
+
+;(defn properties-to-string [node] 
+;  (let [options (get node :options)]
+;    (str "<html><body>" 
+;         (map (fn [key] (apply str (str "<p><b>" (name key) ":</b> " (get options key) "</p>"))) (keys options))
+;         "</body></html>")))
+
+(defmethod node-ui :csv-in [node]
+  (let 
+    [uinode (label
+              :h-text-position :center
+              :halign :center
+              :border (line-border :color "#000")
+              :text ".CSV File"
+              :id (get node :id)
+              :resource ::input)]
+    (do (listen uinode
+                :mouse-entered (fn [e] (invoke-later
+                  (config! (select (to-root uinode) [:#description-panel]) :text (properties-to-string node))))
+                	:mouse-clicked (fn [e] (csv-in-show-properties node)))
+        uinode)))
+
 
 (defn node-palette [ name type describe ] 
 	(let 

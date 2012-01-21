@@ -1,5 +1,5 @@
 (ns grotesqui.core
- (:use [seesaw core mig chooser dev])
+ (:use [seesaw core mig chooser dev border font])
   (:require [seesaw.dnd :as dnd], [grotesqui.nodes :as uinodes], [grotesqui.fakeql :as ql])
  ;(:gen-class :main true))
 )
@@ -19,13 +19,7 @@
 ; Description panel
 (defn describe 
 	([text] (invoke-later (config! (select *root* [:#description-panel]) :text text)))
-	([] (invoke-later (config! (select *root* [:#description-panel]) :text (str
-		"<html><body>"
-		"<h1>Help:</h1>"
-		"<b>New nodes:</b> Drag nodes from left to right<br />"
-		"<b>Info:</b> Mouse over anything to get information about it<br />"
-		"<b>Edit:</b> Double click to edit properites<br />"
-		"</body></html>")))))
+	([] (invoke-later (config! (select *root* [:#description-panel]) :resource ::description-pane))))
 
 (defn save-as-action [e]
   (do 
@@ -104,7 +98,8 @@
 	"Creates an empty description panel with the id :description-panel
 	 This will hold error messages when relevant and help text when mousing over things"
 	[] 
-	(label :text "Description" :id :description-panel))
+	(label :text "Description" :id :description-panel :font (font :style :plain) :border (line-border :color "#999" :thickness 1) :background "#fff" :v-text-position :top :valign :top))
+
 
 
 (defn mbar 
@@ -145,7 +140,7 @@
 		(config! *root* :content (mig-panel   ;fill out with base content
 	 		:constraints ["fill", "[fill]", "[fill]"]
 			:items 
-				[[(make-description-panel) "height 150px!, dock south"]
+				[[(make-description-panel) "gap 10px 6px 10px 6px, height 150px!, dock south"]
 				 [(scrollable (make-palette) :hscroll :never) "dock west, width 200px!"]
 	 			 [(make-canvas) "grow"]]))
 		(describe) ;set the default text in the describe panel
